@@ -16,7 +16,7 @@ exit();
 fclose ($TxtRes); //关闭指针
 setcookie('getapi', null);//php删除名为getapi的cookie
 setcookie('geturl', null);//php删除名为geturl的cookie
-echo('<script language="JavaScript">top.location.href=location.href;alert("解析完毕!!!");</script>');//写入url后刷新主页面并弹出提示框
+echo('<script language="JavaScript">top.location.href=top.location.href;alert("解析完毕!!!");</script>');//写入url后刷新主页面并弹出提示框
 }else{
 echo "<script language=JavaScript>location.replace(location.href);</script>";//php刷新页面
 }
