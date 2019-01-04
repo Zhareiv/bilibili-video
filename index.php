@@ -1,18 +1,18 @@
-﻿<html>
+<html>
 <head>
 <meta name="referrer" content="no-referrer"/>
 </head>
 <body>
 <?php
 $file = "geturl.txt";
-if(file_exists($file)){
+if (file_exists($file)) {
 $msg = file_get_contents($file);//使用file_get_contents函数获取url
 $array = get_headers($msg,1);
-if(preg_match('/200/',$array[0])){//判断url有效性
-$src="";
-$url=$msg;
-}else{//url无效,从iframe获取url
-$src="geturl.php";
+if (preg_match('/200/',$array[0])) {//判断url有效性
+$src = "";
+$url = $msg;
+} else {//url无效,从iframe获取url
+$src = "geturl.php";
 //提示等待,一段时间后可自己刷新页面
 echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~25秒),若30秒后无反应可自行刷新页面");</script>');
 }
@@ -47,7 +47,6 @@ echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,�
     //}//
 });
 </script>
-
 
 </body>
 </html>
