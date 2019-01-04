@@ -38,7 +38,7 @@ curl_setopt($curl,CURLOPT_USERAGENT,$UserAgent);
 curl_setopt($curl,CURLOPT_FOLLOWLOCATION,1);//设置这个选项为一个非零值(象 “Location: “)的头，服务器会把它当做HTTP头的一部分发送(注意这是递归的，PHP将发送形如 “Location: “的头)
 $data=curl_exec($curl);//获取返回的json代码
 curl_close($curl);//关闭cURL资源，并释放系统资源//echo curl_errno($curl); //返回0时表示程序执行成功
-if ($data === '{"captcha":"ok","message":"\u4e3a\u4e86\u9632\u6b62\u975e\u6388\u6743\u4f7f\u7528\u672c\u7ad9\u63a5\u53e3\uff0c\u8bf7\u8f93\u5165\u9a8c\u8bc1\u7801\uff01"}') {
+if ($data == '{"captcha":"ok","message":"\u4e3a\u4e86\u9632\u6b62\u975e\u6388\u6743\u4f7f\u7528\u672c\u7ad9\u63a5\u53e3\uff0c\u8bf7\u8f93\u5165\u9a8c\u8bc1\u7801\uff01"}') {
 	include("./Snoopy.class.php");
 	$data = new Snoopy;
 	$data->fetch($url1);//获取所有内容
@@ -58,7 +58,7 @@ function getjson(){//获取含有url字符串的json数据
 	return str2;
 	}
 var json = getjson()
-json = json.replace(/[\\]/g,'');json = json.replace('amp;','');json = json.replace('amp;','');json =json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');
+json = json.replace(/[\\]/g,'');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');
 //alert(json);
 function geturl(){//解析返回josn字符串代码获取视频URL
 	var str = json//JSON.stringify();//定义json对象转换字符
@@ -70,7 +70,7 @@ function geturl(){//解析返回josn字符串代码获取视频URL
 	}
 //alert(geturl());
 var name = "geturl",value = geturl();//js定义cookie数据
-document.cookie=name+" = " + value + ";";//js写入cookie数据
+document.cookie = name + " = " + value + ";";//js写入cookie数据
 </script>
 </head>
 <body>
