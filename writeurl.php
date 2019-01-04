@@ -1,7 +1,7 @@
 <?php
 if (isset($_COOKIE["geturl"])) {
 $TxtFileName = "geturl.txt";//文件名称
-if (($TxtRes=fopen($TxtFileName,"w+")) === FALSE) {//以读写方式打写指定文件，如果文件不存则创建
+if (($TxtRes = fopen($TxtFileName,"w+")) === FALSE) {//以读写方式打写指定文件，如果文件不存则创建
 //创建可写文件$TxtFileName失败
 exit();
 }
