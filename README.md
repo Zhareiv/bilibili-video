@@ -8,6 +8,3 @@
 
 ## 使用说明
 修改 av = "..."
-
-## 项目示例
-请访问https://injahow.com/8phpxm/
