@@ -6,7 +6,7 @@ $result = file_get_contents($url0);//输出parsevideo.com网站，为获取hash
 echo $result;
 ?>
 <script type="text/javascript">
-var av = "36417189";
+var av = "30590880";
 var hash = "",str1 = "",url1 = "",str1 = "",url = "";
 function load() {//获取url0源代码，为了获取动态hash
         var str=document.getElementsByTagName('html')[0].innerHTML;
