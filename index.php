@@ -1,33 +1,34 @@
+<!DOCTYPE html>
 <html>
 <head>
-<meta name="referrer" content="no-referrer"/>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="referrer" content="never">
+<meta http-equiv="X-UA-Compatible" content="IE=11" />
+<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport">
 </head>
-<body>
+<body marginwidth="0" marginheight="0" style="position:absolute;width:100%;top:0;bottom:0;backgroung:#000">
 <?php
 $file = "geturl.txt";
 if (file_exists($file)) {
-$msg = file_get_contents($file);//使用file_get_contents函数获取url
-$array = get_headers($msg,1);
-if (preg_match('/200/',$array[0])) {//判断url有效性
-$src = "";
-$url = $msg;
-} else {//url无效,从iframe获取url
-$src = "geturl.php";
-//提示等待,一段时间后可自己刷新页面
-echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~25秒),若30秒后无反应可自行刷新页面");</script>');
-}
+	$msg = file_get_contents($file);//使用file_get_contents函数获取url
+	$array = get_headers($msg,1);
+	if (preg_match('/200/',$array[0])) {//判断url有效性
+		$url = $msg;
+		} else {//url无效,从iframe获取url
+		include("./geturl.php");
+		//提示等待,一段时间后可自己刷新页面
+		echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
+	}
 }
 ?>
-<iframe src="<?php echo($src);?>" frameborder="0" height="0" width="0"></iframe>
-<!--............................................................................................................................................................................................................................................................................................................................................. -->
+
 <link rel="stylesheet" href="./DPlayer.min.css">
-<div id="player1" class="dplayer"></div>
-<!-- ... -->
-<script src="./DPlayer.min.js"></script>
+<div id="player1"></div>
+<script type="text/javascript" src="./DPlayer.min.js" charset="utf-8"></script>
 <script>
 	var dp = new DPlayer({
     element: document.getElementById('player1'),//可选，player元素
-    autoplay: false,//可选，自动播放视频，不支持移动浏览器
+    autoplay: true,//可选，自动播放视频，不支持移动浏览器
     theme: '#FADFA3',//可选，主题颜色，默认: #b7daff
     loop: true,//可选，循环播放音乐，默认：true
     lang: 'zh',//可选，语言，`zh'用于中文，`en'用于英语，默认：Navigator language
@@ -47,7 +48,5 @@ echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,�
     //}//
 });
 </script>
-
 </body>
 </html>
-
