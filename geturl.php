@@ -1,5 +1,5 @@
 <?php
-$av="36417189";
+$av="30590880";
 $hash = gethash();
 $api = "https://www.parsevideo.com/api.php?url=https://www.bilibili.com/video/av".$av."&hash=".$hash;
 $json = getjson($api);
