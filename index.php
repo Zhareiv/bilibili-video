@@ -19,6 +19,10 @@ if (file_exists($file)) {
 		//提示等待,一段时间后可自己刷新页面
 		echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
 	}
+} else {
+include("./geturl.php");
+//提示等待,一段时间后可自己刷新页面
+echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
 }
 ?>
 
@@ -28,9 +32,9 @@ if (file_exists($file)) {
 <script>
 	var dp = new DPlayer({
     element: document.getElementById('player1'),//可选，player元素
-    autoplay: true,//可选，自动播放视频，不支持移动浏览器
+    autoplay: false,//可选，自动播放视频，不支持移动浏览器
     theme: '#FADFA3',//可选，主题颜色，默认: #b7daff
-    loop: true,//可选，循环播放音乐，默认：true
+    loop: false,//可选，循环播放音乐，默认：false
     lang: 'zh',//可选，语言，`zh'用于中文，`en'用于英语，默认：Navigator language
     screenshot: false,//可选，启用截图功能，默认值：false，注意：如果设置为true，视频和视频截图必须启用跨域
     hotkey: true,//可选，绑定热键，包括左右键和空格，默认值：true
