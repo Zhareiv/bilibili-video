@@ -1,79 +1,97 @@
-<html>
-<head>
 <?php
-$url0 = "https://www.parsevideo.com";
-$result = file_get_contents($url0);//输出parsevideo.com网站，为获取hash
-echo $result;
-?>
-<script type="text/javascript">
-var av = "30590880";
-var hash = "",str1 = "",url1 = "",str1 = "",url = "";
-function load() {//获取url0源代码，为了获取动态hash
-        var str=document.getElementsByTagName('html')[0].innerHTML;
-        return str;
-	}
-str1 = load();
-function gethash() {//实时获取hash字符串hash="…………"
-	hash = str1.match(/hash = (\S*)/)[1];//匹配hash大致字符串
-	hash = hash.substring(1, hash.length-2);//hash加工截取
-	return hash;
-	}
-url1 = "https://www.parsevideo.com/api.php?url=https://www.bilibili.com/video/av" + av + "&hash=" + gethash();
-var name = "getapi",value = url1//js定义cookie数据
-document.cookie = name+" = " + value + ";"//js写入cookie数据
-</script>
-
-<?php
-if (isset($_COOKIE["getapi"])) {
-$url1 = $_COOKIE["getapi"];//php读取js写入的cookie数据
-$UserAgent = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506; .NET CLR 3.5.21022; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-$curl = curl_init();//创建一个新的CURL资源
-curl_setopt($curl,CURLOPT_URL,$url1);//设置URL和相应的选项
-curl_setopt($curl,CURLOPT_HEADER,0);//0表示不输出Header，1表示输出
-curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);//设定是否显示头信息,1显示，0不显示//如果成功只将结果返回，不自动输出任何内容。如果失败返回FALSE
-curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,false);
-curl_setopt($curl,CURLOPT_SSL_VERIFYHOST,false);
-curl_setopt($curl,CURLOPT_ENCODING,'');//设置编码格式，为空表示支持所有格式的编码//header中“Accept-Encoding: ”部分的内容，支持的编码格式为："identity"，"deflate"，"gzip"
-curl_setopt($curl,CURLOPT_USERAGENT,$UserAgent);
-curl_setopt($curl,CURLOPT_FOLLOWLOCATION,1);//设置这个选项为一个非零值(象 “Location: “)的头，服务器会把它当做HTTP头的一部分发送(注意这是递归的，PHP将发送形如 “Location: “的头)
-$data=curl_exec($curl);//获取返回的json代码
-curl_close($curl);//关闭cURL资源，并释放系统资源//echo curl_errno($curl); //返回0时表示程序执行成功
-if ($data == '{"captcha":"ok","message":"\u4e3a\u4e86\u9632\u6b62\u975e\u6388\u6743\u4f7f\u7528\u672c\u7ad9\u63a5\u53e3\uff0c\u8bf7\u8f93\u5165\u9a8c\u8bc1\u7801\uff01"}') {
+$av="36417189";
+$hash = gethash();
+$api = "https://www.parsevideo.com/api.php?url=https://www.bilibili.com/video/av".$av."&hash=".$hash;
+$json = getjson($api);
+if($json=='{"captcha":"ok","message":"\u4e3a\u4e86\u9632\u6b62\u975e\u6388\u6743\u4f7f\u7528\u672c\u7ad9\u63a5\u53e3\uff0c\u8bf7\u8f93\u5165\u9a8c\u8bc1\u7801\uff01"}') {
 	include("./Snoopy.class.php");
-	$data = new Snoopy;
-	$data->fetch($url1);//获取所有内容
-	$data = $data->results;
-	echo $data;
-	} else {
-	echo $data;
-	}
-} else {
-echo "<script language=JavaScript> location.replace(location.href);</script>";//php刷新页面
+	$json = new Snoopy;
+	$json->fetch($api);//获取所有内容
+	$json = $json->results;
 }
+//echo $json;
+$result = array();
+preg_match_all("/(?:url)(.*)(?:thumb)/i",$json, $result);//匹配视频url大致字符串
+$geturl = $result[1][0];
+$geturl = substr($geturl, 3, strlen($geturl) - 6);//截取url完整字符串
+$geturl = str_replace('\\','',$geturl);//删除\得到url正常字符串
+//echo $geturl;
+$geturl = str_replace('http','https',$geturl);//修改为https
+
+$array = get_headers($geturl,1);
+if (preg_match('/200/',$array[0])) {//判断解析出的url(包含解析异常判断)有效性
+writeurl("geturl.txt" ,$geturl);
+echo "<script language=JavaScript> location.replace(location.href);</script>";//php刷新页面
+	} else {//url无效,从iframe获取url
+	//提示后台解析失败
+	echo '<script language="JavaScript"> alert("后台解析失败，请稍后再试！！！");</script>';
+}
+
+function gethash() {//实时获取hash字符串hash="…………"		
+	$url = "https://www.parsevideo.com";
+	$data = file_get_contents($url);//parsevideo.com获取hash
+	//echo $data;
+	$result = array();
+	preg_match_all("/(?:hash =)(.*)(?:;)/i",$data, $result);//匹配hash大致字符串
+	$data = $result[1][0];
+	$data = substr($data, 2, strlen($data)-3);
+	return $data;
+}
+function getjson($url) {
+	$curl = curl_init();//创建一个新的CURL资源
+	$headers = randIP();
+	curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);//伪造请求ip
+	curl_setopt($curl, CURLOPT_REFERER, "https://www.parsevideo.com");//伪造请求源referer
+	curl_setopt($curl,CURLOPT_URL,$url);//设置URL和相应的选项
+	curl_setopt($curl,CURLOPT_HEADER,0);//0表示不输出Header，1表示输出
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);//数据不输出到页面
+	curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,false);
+	curl_setopt($curl,CURLOPT_SSL_VERIFYHOST,false);
+	curl_setopt($curl,CURLOPT_ENCODING,'');//设置编码格式，为空表示支持所有格式的编码//header中“Accept-Encoding: ”部分的内容，支持的编码格式为："identity"，"deflate"，"gzip"
+	$UserAgent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+	curl_setopt($curl,CURLOPT_USERAGENT,$UserAgent);//模拟windows用户正常访问
+	curl_setopt($curl,CURLOPT_FOLLOWLOCATION,1);//设置这个选项为一个非零值(象 “Location: “)的头，服务器会把它当做HTTP头的一部分发送(注意这是递归的，PHP将发送形如 “Location: “的头)
+	$json = curl_exec($curl);
+	curl_close($curl);
+	return $json;
+}
+function randIP(){//随机ip
+	$ip_long = array(
+		array('607649792', '608174079'), //36.56.0.0-36.63.255.255
+		array('1038614528', '1039007743'), //61.232.0.0-61.237.255.255
+		array('1783627776', '1784676351'), //106.80.0.0-106.95.255.255
+		array('2035023872', '2035154943'), //121.76.0.0-121.77.255.255
+		array('2078801920', '2079064063'), //123.232.0.0-123.235.255.255
+		array('-1950089216', '-1948778497'), //139.196.0.0-139.215.255.255
+		array('-1425539072', '-1425014785'), //171.8.0.0-171.15.255.255
+		array('-1236271104', '-1235419137'), //182.80.0.0-182.92.255.255
+		array('-770113536', '-768606209'), //210.25.0.0-210.47.255.255
+		array('-569376768', '-564133889'), //222.16.0.0-222.95.255.255
+	);
+	$rand_key = mt_rand(0, 9);
+	$ip= long2ip(mt_rand($ip_long[$rand_key][0], $ip_long[$rand_key][1]));
+	$headers['CLIENT-IP'] = $ip;
+	$headers['X-FORWARDED-FOR'] = $ip;
+	$headerArr = array();
+	foreach( $headers as $n => $v ) {
+		$headerArr[] = $n .':' . $v;
+	}
+	return $headerArr;
+}
+function writeurl($TxtFileName,$url) {//服务器存放写入url的txt文件(名称,字符串)
+	if(($TxtRes=fopen($TxtFileName,"w+")) === FALSE){//以读写方式打写指定文件，如果文件不存则创建
+	//创建可写文件$TxtFileName失败
+	exit();
+	}
+	//创建可写文件$TxtFileName成功
+	$StrConents = $url;//要写进文件的内容
+	if(!fwrite($TxtRes,$StrConents)) {//将信息写入文件
+	//尝试向文件$TxtFileName写入$StrConents失败
+	fclose($TxtRes);
+	exit();
+	}
+	//尝试向文件$TxtFileName写入$StrConents成功！
+	fclose($TxtRes); //关闭指针
+}
+
 ?>
-<script type="text/javascript">
-str2 = load();//再次获取含有json代码的网页源码
-function getjson(){//获取含有url字符串的json数据
-	str2 = str2.match(/{"pa(\S*)/)[1];//匹配json大致字符串
-	return str2;
-	}
-var json = getjson()
-json = json.replace(/[\\]/g,'');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');json = json.replace('amp;','');
-//alert(json);
-function geturl(){//解析返回josn字符串代码获取视频URL
-	var str = json//JSON.stringify();//定义json对象转换字符
-	url = str.match(/url(\S*)thumb/)[1];//匹配url大致字符串
-	url = url.substring(3, url.length-3);//url加工截取
-	url = "https" + url.substring(4, url.length);//url替换为https
-	//url = String(url);
-	return url;
-	}
-//alert(geturl());
-var name = "geturl",value = geturl();//js定义cookie数据
-document.cookie = name + " = " + value + ";";//js写入cookie数据
-</script>
-</head>
-<body>
-<iframe src="writeurl.php" frameborder="0" height="0" width="0"></iframe>
-</body>
-</html>
