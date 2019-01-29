@@ -21,8 +21,8 @@ $geturl = str_replace('http','https',$geturl);//修改为https
 $array = get_headers($geturl,1);
 if (preg_match('/200/',$array[0])) {//判断解析出的url(包含解析异常判断)有效性
 writeurl("geturl.txt" ,$geturl);
-echo "<script language=JavaScript> location.replace(location.href);</script>";//php刷新页面
-	} else {
+echo('<script language="JavaScript">top.location.href=top.location.href;alert("解析完毕!!!");</script>');//写入刷新主页面并弹出提示框
+	} else {//url无效,从iframe获取url
 	//提示后台解析失败
 	echo '<script language="JavaScript"> alert("后台解析失败，请稍后再试！！！");</script>';
 }
