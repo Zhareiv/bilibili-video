@@ -9,7 +9,9 @@
 <body marginwidth="0" marginheight="0" style="position:absolute;width:100%;top:0;bottom:0;backgroung:#000">
 
 <?php
-$file = "geturl.txt";
+$av = $_GET['av'];//30590880
+setcookie("av",$av);
+$file = $av.".txt";
 if (file_exists($file)) {
 	$msg = file_get_contents($file);//使用file_get_contents函数获取url
 	$array = get_headers($msg,1);
