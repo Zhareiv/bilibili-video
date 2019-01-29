@@ -14,15 +14,15 @@ if (file_exists($file)) {
 	$array = get_headers($msg,1);
 	if (preg_match('/200/',$array[0])) {//判断url有效性
 		$url = $msg;
-		} else {//url无效,从iframe获取url
-		include("./geturl.php");
+		} else {//url无效,从geturl.php获取url
 		//等待,一段时间后可自己刷新页面
-		//echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
-	}
+		echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
+		include("./geturl.php");
+		}
 } else {
-include("./geturl.php");
 //等待,一段时间后可自己刷新页面
-//echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
+echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
+include("./geturl.php");
 }
 ?>
 
