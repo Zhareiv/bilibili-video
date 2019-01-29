@@ -7,6 +7,7 @@
 <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport">
 </head>
 <body marginwidth="0" marginheight="0" style="position:absolute;width:100%;top:0;bottom:0;backgroung:#000">
+
 <?php
 $file = "geturl.txt";
 if (file_exists($file)) {
@@ -17,12 +18,12 @@ if (file_exists($file)) {
 		} else {//url无效,从geturl.php获取url
 		//等待,一段时间后可自己刷新页面
 		echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
-		include("./geturl.php");
+		$src = "geturl.php";//include("./geturl.php");
 		}
 } else {
 //等待,一段时间后可自己刷新页面
-echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
-include("./geturl.php");
+echo('<script type="text/javascript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
+$src = "geturl.php";//include("./geturl.php");
 }
 ?>
 
@@ -52,5 +53,10 @@ include("./geturl.php");
     //}//
 });
 </script>
+
+<?php if ($src != ''){ ?>
+<iframe src="<?php echo($src);?>" frameborder="0" height="0" width="0"></iframe>
+<?php } ?>
+
 </body>
 </html>
