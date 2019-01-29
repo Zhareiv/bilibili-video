@@ -11,7 +11,7 @@
 <?php
 $av = $_GET['av'];//30590880
 setcookie("av",$av);
-$file = $av.".txt";
+$file = "./geturl/".$av.".txt";
 if (file_exists($file)) {
 	$msg = file_get_contents($file);//使用file_get_contents函数获取url
 	$array = get_headers($msg,1);
