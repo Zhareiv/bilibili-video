@@ -9,23 +9,58 @@
 <body marginwidth="0" marginheight="0" style="position:absolute;width:100%;top:0;bottom:0;backgroung:#000">
 
 <?php
-$av = $_GET['av'];//30590880
+$query = $_SERVER["QUERY_STRING"];
+$array = queryarray($query);
+if (array_key_exists("av",$array)) {//av参数存在
+$av = $_GET['av'];
 setcookie("av",$av);
-$file = "./geturl/".$av.".txt";
+	if (array_key_exists("p",$array)) {//p参数存在
+	$p = $_GET['p'];
+	setcookie("p",$p);
+	} else {//p参数不存在
+    $p = "1";
+	setcookie("p","1");
+    }
+} else {//av参数不存在
+echo('<script type="text/javascript"> alert("参数有误！！！");</script>');
+exit;//结束所有脚本
+}
+$file = "./geturl/".$av.".json";
 if (file_exists($file)) {
 	$msg = file_get_contents($file);//使用file_get_contents函数获取url
-	$array = get_headers($msg,1);
-	if (preg_match('/200/',$array[0])) {//判断url有效性
-		$url = $msg;
-		} else {//url无效,从geturl.php获取url
+    //if ($msg = "") ?
+    $json = json_decode($msg);//json字符串对象化
+    header("Content-Type: text/html; charset=UTF-8");//定义头文件，防止乱码
+    $videojson = $json->video[$p-1];
+    $videourl = $videojson->url;
+    if ($videourl == $p) {//url为初始化状态
+      $videourl = "https://api.injahow.cn/".$p.".mp4";//随意无效url
+    } else {
+      if ($videourl == "") {//url为异常空状态
+      $videourl = "https://api.injahow.cn/".$p.".mp4";//随意无效url
+      }
+    }
+	$array = get_headers($videourl,1);//get_headers函数需要开启相关扩展
+	if (preg_match('/200/',$array[0])) {//url有效
+		$url = $videourl;
+	} else {//url无效,从geturl.php获取url
 		//等待,一段时间后可自己刷新页面
 		echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
 		$src = "geturl.php";//include("./geturl.php");
-		}
+    }
 } else {
 //等待,一段时间后可自己刷新页面
 echo('<script type="text/javascript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
 $src = "geturl.php";//include("./geturl.php");
+}
+function queryarray($query) {
+	$queryParts = explode('&', $query);
+	$params = array();
+	foreach ($queryParts as $param) {
+	$item = explode('=', $param);
+	$params[$item[0]] = $item[1];
+	}
+return $params;
 }
 ?>
 
@@ -55,10 +90,8 @@ $src = "geturl.php";//include("./geturl.php");
     //}//
 });
 </script>
-
 <?php if ($src != ''){ ?>
 <iframe src="<?php echo($src);?>" frameborder="0" height="0" width="0"></iframe>
 <?php } ?>
-
 </body>
 </html>
