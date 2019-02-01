@@ -1,5 +1,6 @@
 <?php
-$av = $_COOKIE["av"];
+$av = $_COOKIE["av"];//$av = "40487808";
+$p = $_COOKIE["p"];//$p = "1";
 $hash = gethash();
 $api = "https://www.parsevideo.com/api.php?url=https://www.bilibili.com/video/av".$av."&hash=".$hash;
 $json = getjson($api);
@@ -10,25 +11,45 @@ if($json=='{"captcha":"ok","message":"\u4e3a\u4e86\u9632\u6b62\u975e\u6388\u6743
 	$json = $json->results;
 }
 //echo $json;
-$result = array();
-preg_match_all("/(?:url)(.*)(?:thumb)/i",$json, $result);//匹配视频url大致字符串
-$geturl = $result[1][0];
-$geturl = substr($geturl, 3, strlen($geturl) - 6);//截取url完整字符串
-$geturl = str_replace('\\','',$geturl);//删除\得到url正常字符串
-//echo $geturl;
-$geturl = str_replace('http','https',$geturl);//修改为https
+//php解析json字符串数据
+$json = json_decode($json);//json字符串对象化
+header("Content-Type: text/html; charset=UTF-8");//定义头文件，防止乱码
+$status = $json->status;
+if ($status !== "ok") {//
+echo '<script language="JavaScript"> alert("？？？解析失败？？？");</script>';
+exit;
+}
+$videojson = $json->video[$p-1];
+$videourl = $videojson->url;
+if ($videourl == "") {
+echo '<script language="JavaScript"> alert("？？？解析返回值获取失败？？？");</script>';
+exit;
+}
+$videourl = str_replace('http','https',$videourl);//修改为https
 
-$array = get_headers($geturl,1);
-if (preg_match('/200/',$array[0])) {//判断解析出的url(包含解析异常判断)有效性
-$file = "./geturl/".$av.".txt";
-writeurl($file ,$geturl);
-echo('<script language="JavaScript">top.location.href=top.location.href;alert("解析完毕！！！");</script>');//写入刷新主页面并弹出提示框
-	} else {//url无效,从iframe获取url
-	//提示后台解析失败
-	echo '<script language="JavaScript"> alert("后台解析失败，请稍后再试！！！");</script>';
+$file = "./geturl/".$av.".json";
+if (file_exists($file)) {//判断json数据叠加条件
+$getjson = file_get_contents($file);
+} else {
+$getjson = array('av'=>$av,'video'=>[],'status'=>'ok');//json初始化
+$getjson = json_encode($getjson);//php数组json字符串化
+writeurl($file ,$getjson);
 }
 
-function gethash() {//实时获取hash字符串hash="…………"		
+$getjson = json_decode($getjson,ture);
+
+for ($p0=1;$p0<=$p;$p0++) {//json初始化后，video初始化
+if (array_key_exists($p0-1,$getjson[video])) {//判断数组中关键字key是否存在
+} else {
+$getjson[video][$p0-1] = array('p'=>"$p0",'url'=>"$p0");
+}
+}
+$getjson[video][$p-1] = array('p'=>$p,'url'=>$videourl);//video单元数据覆盖
+$getjson = json_encode($getjson);
+writeurl($file ,$getjson);//json数据更新覆盖
+echo('<script language="JavaScript">top.location.href=top.location.href;alert("！！！解析完毕！！！");</script>');//写入json后弹出提示框并刷新主页面
+
+function gethash() {//实时获取hash字符串hash="…………"
 	$url = "https://www.parsevideo.com";
 	$data = file_get_contents($url);//parsevideo.com获取hash
 	//echo $data;
@@ -41,17 +62,16 @@ function gethash() {//实时获取hash字符串hash="…………"
 function getjson($url) {
 	$curl = curl_init();//创建一个新的CURL资源
 	$headers = randIP();
-	curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);//伪造请求ip
-	curl_setopt($curl, CURLOPT_REFERER, "https://www.parsevideo.com");//伪造请求源referer
+	curl_setopt($curl,CURLOPT_HTTPHEADER,$headers);//伪造请求ip
+	curl_setopt($curl,CURLOPT_REFERER,"https://www.parsevideo.com");//伪造请求源referer
 	curl_setopt($curl,CURLOPT_URL,$url);//设置URL和相应的选项
 	curl_setopt($curl,CURLOPT_HEADER,0);//0表示不输出Header，1表示输出
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);//数据不输出到页面
+	curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);//数据不输出到页面
 	curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,false);
 	curl_setopt($curl,CURLOPT_SSL_VERIFYHOST,false);
 	curl_setopt($curl,CURLOPT_ENCODING,'');//设置编码格式，为空表示支持所有格式的编码//header中“Accept-Encoding: ”部分的内容，支持的编码格式为："identity"，"deflate"，"gzip"
-	$UserAgent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+	$UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
 	curl_setopt($curl,CURLOPT_USERAGENT,$UserAgent);//模拟windows用户正常访问
-	curl_setopt($curl,CURLOPT_FOLLOWLOCATION,1);//设置这个选项为一个非零值(象 “Location: “)的头，服务器会把它当做HTTP头的一部分发送(注意这是递归的，PHP将发送形如 “Location: “的头)
 	$json = curl_exec($curl);
 	curl_close($curl);
 	return $json;
@@ -79,7 +99,7 @@ function randIP(){//随机ip
 	}
 	return $headerArr;
 }
-function writeurl($TxtFileName,$url) {//服务器存放写入url的txt文件(名称,字符串)
+function writeurl($TxtFileName,$url) {//服务器存放写入数据的文件(名称/路径,字符串)
 	if(($TxtRes=fopen($TxtFileName,"w+")) === FALSE){//以读写方式打写指定文件，如果文件不存则创建
 	//创建可写文件$TxtFileName失败
 	exit();
