@@ -11,4 +11,4 @@
 修改参数av = "..."或p="..."(p省略则默认为1)
 
 ## 项目演示
-https://injahow.com/mylab/1/?av=30590880&p=1
+https://injahow.com/mylab/1/?av=14661594&p=1
