@@ -50,7 +50,7 @@ writeurl($file ,$getjson);//json数据更新覆盖
 echo('<script language="JavaScript">top.location.href=top.location.href;alert("！！！解析完毕！！！");</script>');//写入json后弹出提示框并刷新主页面
 
 function gethash() {//实时获取hash字符串hash="…………"
-	$url = "https://www.parsevideo.com";
+	$url = "https://pv.vlogdownloader.com/";
 	$data = file_get_contents($url);//parsevideo.com获取hash
 	//echo $data;
 	$result = array();
