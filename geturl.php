@@ -2,7 +2,7 @@
 $av = $_COOKIE["av"];//$av = "40487808";
 $p = $_COOKIE["p"];//$p = "1";
 $hash = gethash();
-$api = "https://www.parsevideo.com/api.php?url=https://www.bilibili.com/video/av".$av."&hash=".$hash;
+$api = "https://pv.vlogdownloader.com/api.php?url=https://www.bilibili.com/video/av".$av."&hash=".$hash;
 $json = getjson($api);
 if($json=='{"captcha":"ok","message":"\u4e3a\u4e86\u9632\u6b62\u975e\u6388\u6743\u4f7f\u7528\u672c\u7ad9\u63a5\u53e3\uff0c\u8bf7\u8f93\u5165\u9a8c\u8bc1\u7801\uff01"}') {
 	include("./Snoopy.class.php");
@@ -63,7 +63,7 @@ function getjson($url) {
 	$curl = curl_init();//创建一个新的CURL资源
 	$headers = randIP();
 	curl_setopt($curl,CURLOPT_HTTPHEADER,$headers);//伪造请求ip
-	curl_setopt($curl,CURLOPT_REFERER,"https://www.parsevideo.com");//伪造请求源referer
+	curl_setopt($curl,CURLOPT_REFERER,"https://pv.vlogdownloader.com/");//伪造请求源referer
 	curl_setopt($curl,CURLOPT_URL,$url);//设置URL和相应的选项
 	curl_setopt($curl,CURLOPT_HEADER,0);//0表示不输出Header，1表示输出
 	curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);//数据不输出到页面
