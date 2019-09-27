@@ -5,7 +5,7 @@ if ($av=='') {
 echo '<!DOCTYPE HTML><html><meta http-equiv="Content-Type" content="text/html;charset=utf-8"/><head><link rel="shortcut icon" href="favicon.png"><title>b-video</title></head><body><h1>参数说明</h1>
     type: 类型<br />
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;av 视频av号<br />
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p 视频集数<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p 视频集数<br /><br />
     此API基于第三方解析网站构建。<br /><br />
     例如：<a href="https://api.injahow.cn/bvideo/?av=14661594&p=1" target="_blank">https://api.injahow.cn/bvideo/?av=14661594&p=1</a><br />
     </body></html>';
