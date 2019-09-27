@@ -1,36 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="referrer" content="never">
-<meta http-equiv="X-UA-Compatible" content="IE=11" />
-<meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport">
-</head>
-<body marginwidth="0" marginheight="0" style="position:absolute;width:100%;top:0;bottom:0;backgroung:#000">
-
 <?php
-$query = $_SERVER["QUERY_STRING"];
-$array = queryarray($query);
-if (array_key_exists("av",$array)) {//av参数存在
 $av = $_GET['av'];
-setcookie("av",$av);
-	if (array_key_exists("p",$array)) {//p参数存在
-	$p = $_GET['p'];
-	setcookie("p",$p);
-	} else {//p参数不存在
-    $p = "1";
-	setcookie("p","1");
-    }
-} else {//av参数不存在
-echo('<script type="text/javascript"> alert("参数有误！！！");</script>');
+$p = $_GET['p'];
+if ($av=='') {
+echo '<!DOCTYPE HTML><html><meta http-equiv="Content-Type" content="text/html;charset=utf-8"/><head><link rel="shortcut icon" href="favicon.png"><title>b-video</title></head><body><h1>参数说明</h1>
+    type: 类型<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;av 视频av号<br />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p 视频集数<br />
+    此API基于第三方解析网站构建。<br /><br />
+    例如：<a href="https://api.injahow.cn/bvideo/?av=14661594&p=1" target="_blank">https://api.injahow.cn/bvideo/?av=14661594&p=1</a><br />
+    </body></html>';
 exit;//结束所有脚本
+}else{
+setcookie("av",$av);
 }
+if ($p=='') {
+$p = "1";
+setcookie("p",$p);
+}else{
+setcookie("p",$p);
+}
+
 $file = "./geturl/".$av.".json";
 if (file_exists($file)) {
+	header("Content-Type: text/html; charset=UTF-8");//定义头,防止乱码
 	$msg = file_get_contents($file);//使用file_get_contents函数获取url
     //if ($msg = "") ?
     $json = json_decode($msg);//json字符串对象化
-    header("Content-Type: text/html; charset=UTF-8");//定义头文件，防止乱码
     $videojson = $json->video[$p-1];
     $videourl = $videojson->url;
     if ($videourl == $p) {//url为初始化状态
@@ -48,32 +43,22 @@ if (file_exists($file)) {
 		echo('<script language="JavaScript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
 		$src = "geturl.php";//include("./geturl.php");
     }
+
 } else {
-//等待,一段时间后可自己刷新页面
 echo('<script type="text/javascript"> alert("注意:服务端视频URL已失效,确认后将开始后台解析,请等待一段时间(期间请不要关闭此页面,解析时间一般为5~10秒),若一直无反应可自行刷新页面");</script>');
-$src = "geturl.php";//include("./geturl.php");
-}
-function queryarray($query) {
-	$queryParts = explode('&', $query);
-	$params = array();
-	foreach ($queryParts as $param) {
-	$item = explode('=', $param);
-	$params[$item[0]] = $item[1];
-	}
-return $params;
+$src = "geturl.php";
+//include("./geturl.php");//出现卡顿
 }
 ?>
 
-<link rel="stylesheet" href="./DPlayer.min.css">
-<div id="player1"></div>
-<script type="text/javascript" src="./DPlayer.min.js" charset="utf-8"></script>
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"/><meta name="referrer" content="never"><meta http-equiv="X-UA-Compatible" content="IE=11" /><meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport"></head><body marginwidth="0" marginheight="0" style="position:absolute;width:100%;top:0;bottom:0;backgroung:#000"><link rel="stylesheet" href="./DPlayer.min.css"><div id="player1"></div><script type="text/javascript" src="./DPlayer.min.js" charset="utf-8"></script>
 <script>
 	var dp = new DPlayer({
     element: document.getElementById('player1'),//可选，player元素
     autoplay: false,//可选，自动播放视频，不支持移动浏览器
     theme: '#FADFA3',//可选，主题颜色，默认: #b7daff
-    loop: false,//可选，循环播放音乐，默认：false
-    lang: 'zh',//可选，语言，`zh'用于中文，`en'用于英语，默认：Navigator language
+    loop: false,//可选，循环播放，默认：false
+    lang: 'zh-cn',//可选，语言，`zh-cn'用于中文，`en'用于英语，默认：Navigator language
     screenshot: false,//可选，启用截图功能，默认值：false，注意：如果设置为true，视频和视频截图必须启用跨域
     hotkey: true,//可选，绑定热键，包括左右键和空格，默认值：true
     preload: 'auto',//可选，预加载的方式可以是'none''metadata''auto'，默认值：'auto'
@@ -90,8 +75,8 @@ return $params;
     //}//
 });
 </script>
-<?php if ($src != ''){ ?>
-<iframe src="<?php echo($src);?>" frameborder="0" height="0" width="0"></iframe>
-<?php } ?>
-</body>
-</html>
+<?php if ($src !== ''){ ?><iframe src="<?php echo($src);?>" frameborder="0" height="0" width="0"></iframe><?php } ?>
+</body></html>
+
+
+

@@ -1,21 +1,21 @@
 <?php
-$av = $_COOKIE["av"];//$av = "40487808";
+$av = $_COOKIE["av"];//$av = "14661594";
 $p = $_COOKIE["p"];//$p = "1";
+//$av = $_GET["av"];//$av = "14661594";
+//$p = $_GET["p"];//$p = "1";
 $hash = gethash();
 $api = "https://pv.vlogdownloader.com/api.php?url=https://www.bilibili.com/video/av".$av."&hash=".$hash;
 $json = getjson($api);
 if($json=='{"captcha":"ok","message":"\u4e3a\u4e86\u9632\u6b62\u975e\u6388\u6743\u4f7f\u7528\u672c\u7ad9\u63a5\u53e3\uff0c\u8bf7\u8f93\u5165\u9a8c\u8bc1\u7801\uff01"}') {
-	include("./Snoopy.class.php");
-	$json = new Snoopy;
-	$json->fetch($api);//获取所有内容
-	$json = $json->results;
+echo '<script language="JavaScript"> alert("？？？解析失败？？？");</script>';
+exit;
 }
 //echo $json;
 //php解析json字符串数据
 $json = json_decode($json);//json字符串对象化
 header("Content-Type: text/html; charset=UTF-8");//定义头文件，防止乱码
 $status = $json->status;
-if ($status !== "ok") {//
+if ($status != "ok") {//
 echo '<script language="JavaScript"> alert("？？？解析失败？？？");</script>';
 exit;
 }
@@ -41,7 +41,7 @@ $getjson = json_decode($getjson,ture);
 for ($p0=1;$p0<=$p;$p0++) {//json初始化后，video初始化
 if (array_key_exists($p0-1,$getjson[video])) {//判断数组中关键字key是否存在
 } else {
-$getjson[video][$p0-1] = array('p'=>"$p0",'url'=>"$p0");
+$getjson[video][$p0-1] = array('p'=>"$p0",'url'=>"");//初始化
 }
 }
 $getjson[video][$p-1] = array('p'=>$p,'url'=>$videourl);//video单元数据覆盖
@@ -50,33 +50,30 @@ writeurl($file ,$getjson);//json数据更新覆盖
 echo('<script language="JavaScript">top.location.href=top.location.href;alert("！！！解析完毕！！！");</script>');//写入json后弹出提示框并刷新主页面
 
 function gethash() {//实时获取hash字符串hash="…………"
-	$url = "https://pv.vlogdownloader.com/";
-	$data = file_get_contents($url);//parsevideo.com获取hash
-	//echo $data;
+	$data = file_get_contents('https://pv.vlogdownloader.com/');//parsevideo.com获取hash
 	$result = array();
 	preg_match_all("/(?:hash =)(.*)(?:;)/i",$data, $result);//匹配hash大致字符串
 	$data = $result[1][0];
 	$data = substr($data, 2, strlen($data)-3);
 	return $data;
 }
+
 function getjson($url) {
 	$curl = curl_init();//创建一个新的CURL资源
-	$headers = randIP();
-	curl_setopt($curl,CURLOPT_HTTPHEADER,$headers);//伪造请求ip
-	curl_setopt($curl,CURLOPT_REFERER,"https://pv.vlogdownloader.com/");//伪造请求源referer
+	$headers = rand_headers();
 	curl_setopt($curl,CURLOPT_URL,$url);//设置URL和相应的选项
+	curl_setopt($curl,CURLOPT_HTTPHEADER,$headers);//伪造请求ip
+	$ua = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+	curl_setopt($curl,CURLOPT_USERAGENT,$ua);//模拟windows用户正常访问
+	curl_setopt($curl,CURLOPT_REFERER,"https://pv.vlogdownloader.com/");//伪造请求源referer
 	curl_setopt($curl,CURLOPT_HEADER,0);//0表示不输出Header，1表示输出
 	curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);//数据不输出到页面
-	curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,false);
-	curl_setopt($curl,CURLOPT_SSL_VERIFYHOST,false);
-	curl_setopt($curl,CURLOPT_ENCODING,'');//设置编码格式，为空表示支持所有格式的编码//header中“Accept-Encoding: ”部分的内容，支持的编码格式为："identity"，"deflate"，"gzip"
-	$UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
-	curl_setopt($curl,CURLOPT_USERAGENT,$UserAgent);//模拟windows用户正常访问
 	$json = curl_exec($curl);
 	curl_close($curl);
 	return $json;
 }
-function randIP(){//随机ip
+
+function rand_headers(){//随机ip
 	$ip_long = array(
 		array('607649792', '608174079'), //36.56.0.0-36.63.255.255
 		array('1038614528', '1039007743'), //61.232.0.0-61.237.255.255
@@ -99,20 +96,20 @@ function randIP(){//随机ip
 	}
 	return $headerArr;
 }
-function writeurl($TxtFileName,$url) {//服务器存放写入数据的文件(名称/路径,字符串)
-	if(($TxtRes=fopen($TxtFileName,"w+")) === FALSE){//以读写方式打写指定文件，如果文件不存则创建
-	//创建可写文件$TxtFileName失败
+
+function writeurl($TxtFileName,$str) {
+	if(($TxtRes=fopen($TxtFileName,"w+")) === FALSE){//读写打开，不存则创建
+	//创建失败
 	exit();
 	}
-	//创建可写文件$TxtFileName成功
-	$StrConents = $url;//要写进文件的内容
-	if(!fwrite($TxtRes,$StrConents)) {//将信息写入文件
-	//尝试向文件$TxtFileName写入$StrConents失败
+	//创建成功
+	if(!fwrite($TxtRes,$str)) {//写入
+	//写失败
 	fclose($TxtRes);
 	exit();
 	}
-	//尝试向文件$TxtFileName写入$StrConents成功！
-	fclose($TxtRes); //关闭指针
+	//写成功
+	fclose($TxtRes);//关闭指针
 }
 
 ?>
