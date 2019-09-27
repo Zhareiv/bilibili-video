@@ -28,12 +28,8 @@ if (file_exists($file)) {
     $json = json_decode($msg);//json字符串对象化
     $videojson = $json->video[$p-1];
     $videourl = $videojson->url;
-    if ($videourl == $p) {//url为初始化状态
-      $videourl = "https://api.injahow.cn/".$p.".mp4";//随意无效url
-    } else {
-      if ($videourl == "") {//url为异常空状态
-      $videourl = "https://api.injahow.cn/".$p.".mp4";//随意无效url
-      }
+    if ($videourl == '') {//url为初始化状态
+      $videourl = "https://baidu.com/".$p.".mp4";//随意无效url
     }
 	$array = get_headers($videourl,1);//get_headers函数需要开启相关扩展
 	if (preg_match('/200/',$array[0])) {//url有效
@@ -75,8 +71,5 @@ $src = "geturl.php";
     //}//
 });
 </script>
-<?php if ($src !== ''){ ?><iframe src="<?php echo($src);?>" frameborder="0" height="0" width="0"></iframe><?php } ?>
+<?php if ($src !== ''){ ?><iframe src="<?php echo($src);//不会卡顿?>" frameborder="0" height="0" width="0"></iframe><?php } ?>
 </body></html>
-
-
-
